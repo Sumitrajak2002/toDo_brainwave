@@ -1,8 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'package:to_do_app/services/firestore_services.dart';
-import 'package:to_do_app/utils/todo_list.dart';
+import 'package:toDo_brainwave/services/firestore_services.dart';
+import 'package:toDo_brainwave/utils/todo_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:toDo_brainwave/pages/textfield.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -33,6 +34,13 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  // Method to update a note's text
+  void updateNoteText(String docId, String newNote) {
+    firestoreService.updateNoteText(docId, newNote).then((_) {
+      setState(() {});
+    });
+  }
+
   // Method to delete a task from Firestore
   void deleteTask(String docId) {
     firestoreService.deleteNote(docId).then((_) {
@@ -57,7 +65,7 @@ class _MainScreenState extends State<MainScreen> {
           backgroundColor: Colors.deepPurple,
         ),
         body: StreamBuilder<QuerySnapshot>(
-          stream: firestoreService.getNotesStream(), // Corrected method name
+          stream: firestoreService.getNotesStream(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -79,13 +87,14 @@ class _MainScreenState extends State<MainScreen> {
               itemBuilder: (BuildContext context, int index) {
                 final task = toDoList[index];
                 return TodoList(
-                  taskName: task['note'], // Get task name from Firestore
-                  taskCompleted: task[
-                      'isDone'], // Get task completion status from Firestore
-                  onChanged: (value) => checkBoxChanged(
-                      task.id, task['isDone']), // Update task completion status
-                  deleteFunction: (context) =>
-                      deleteTask(task.id), // Delete task
+                  taskName: task['note'],
+                  taskCompleted: task['isDone'],
+                  docId: task.id,
+                  onChanged: (value) =>
+                      checkBoxChanged(task.id, task['isDone']),
+                  deleteFunction: (context) => deleteTask(task.id),
+                  updateFunction: (docId, newNote) =>
+                      updateNoteText(docId, newNote),
                 );
               },
             );
@@ -98,26 +107,11 @@ class _MainScreenState extends State<MainScreen> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: 'Add new task',
-                      filled: true,
-                      fillColor: Colors.deepPurple.shade200,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.deepPurple),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.deepPurple),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                  ),
+                  child: Textfield(textController: _controller),
                 ),
               ),
               FloatingActionButton(
-                onPressed: saveNewTask, // Save new task to Firestore
+                onPressed: saveNewTask,
                 child: const Icon(Icons.add),
               ),
             ],
@@ -127,3 +121,4 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
+

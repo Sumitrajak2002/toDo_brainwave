@@ -1,16 +1,58 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+
 class TodoList extends StatelessWidget {
-  const TodoList(
-      {required this.taskName,
-      super.key,
-      required this.taskCompleted,
-      this.onChanged, this.deleteFunction});
+  const TodoList({
+    required this.taskName,
+    required this.taskCompleted,
+    required this.docId,
+    super.key,
+    this.onChanged,
+    this.deleteFunction,
+    required this.updateFunction,
+  });
+
   final String taskName;
   final bool taskCompleted;
+  final String docId;
   final Function(bool?)? onChanged;
   final Function(BuildContext)? deleteFunction;
+  final Function(String, String) updateFunction;
+
+  void openEditBox(BuildContext context) {
+    final TextEditingController _controller =
+        TextEditingController(text: taskName);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Edit Task'),
+        content: TextField(
+          controller: _controller,
+          decoration: InputDecoration(
+            hintText: 'Enter new task name',
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Save'),
+            onPressed: () {
+              updateFunction(docId,
+                  _controller.text); // Pass the new note to updateFunction
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,24 +79,32 @@ class TodoList extends StatelessWidget {
           child: Row(
             children: [
               Checkbox(
-                  value: taskCompleted,
-                  onChanged: onChanged,
-                  checkColor: Colors.black,
-                  activeColor: Colors.white,
-                  side: const BorderSide(
-                    color: Colors.white,
-                  )),
-              Text(
-                taskName,
-                style: TextStyle(
+                value: taskCompleted,
+                onChanged: onChanged,
+                checkColor: Colors.black,
+                activeColor: Colors.white,
+                side: const BorderSide(
                   color: Colors.white,
-                  fontSize: 18,
-                  decoration: taskCompleted
-                      ? TextDecoration.lineThrough
-                      : TextDecoration.none,
-                  decorationColor: Colors.white,
-                  decorationThickness: 2,
                 ),
+              ),
+              Expanded(
+                child: Text(
+                  taskName,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    decoration: taskCompleted
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
+                    decorationColor: Colors.white,
+                    decorationThickness: 2,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () => openEditBox(context),
+                icon: Icon(Icons.edit),
+                color: Colors.white,
               ),
             ],
           ),
@@ -63,3 +113,4 @@ class TodoList extends StatelessWidget {
     );
   }
 }
+

@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
@@ -23,6 +22,14 @@ class FirestoreService {
   Future<void> updateNote(String docId, bool isDone) {
     return notes.doc(docId).update({
       'isDone': isDone,
+    });
+  }
+
+  // Update : note text if updated
+
+  Future<void> updateNoteText(String docId,  String newNote) {
+    return notes.doc(docId).update({
+      'note': newNote,
     });
   }
 
