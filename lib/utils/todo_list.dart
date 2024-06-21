@@ -1,7 +1,5 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-
 
 class TodoList extends StatelessWidget {
   const TodoList({
@@ -28,6 +26,7 @@ class TodoList extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Edit Task'),
+        backgroundColor: Colors.deepPurple.shade100,
         content: TextField(
           controller: _controller,
           decoration: InputDecoration(
@@ -113,4 +112,3 @@ class TodoList extends StatelessWidget {
     );
   }
 }
-

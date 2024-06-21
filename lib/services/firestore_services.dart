@@ -37,4 +37,4 @@ class FirestoreService {
   Future<void> deleteNote(String docId) {
     return notes.doc(docId).delete();
   }
-}
+    }
